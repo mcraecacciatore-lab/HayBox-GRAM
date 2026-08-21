@@ -33,7 +33,7 @@ void Melee20Button::UpdateDigitalOutputs(const InputState &inputs, OutputState &
     outputs.start = inputs.mb1;
 
     // Hidden Buttons for remapp.ing options
-    outputs.leftStickClick = inputs.lf6;
+    // outputs.leftStickClick = inputs.lf6;
     outputs.rightStickClick = inputs.lf7;
     outputs.capture = inputs.lf8;
     outputs.dpadUp = inputs.lf9;
@@ -247,12 +247,12 @@ void Melee20Button::UpdateAnalogOutputs(const InputState &inputs, OutputState &o
             }
         }
     }
-    // Dedicated shield-drop angle modifier - custom
-    if (inputs.lf6 && directions.diagonal && directions.y == -1) {
-            outputs.leftStickX = 128 + (directions.x * 56);
-            outputs.leftStickY = 128 + (directions.y * 55);      
+    // Dedicated shield-drop modifier
+    if (inputs.lf6 && shield_button_pressed &&
+        directions.vertical && directions.y == -1) {
+        outputs.leftStickX = 128;
+        outputs.leftStickY = 73;
     }
-
     // C-stick ASDI Slideoff angle overrides any other C-stick modifiers (such as
     // angled fsmash).
     if (directions.cx != 0 && directions.cy != 0) {
