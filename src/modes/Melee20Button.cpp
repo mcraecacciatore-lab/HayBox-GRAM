@@ -247,6 +247,11 @@ void Melee20Button::UpdateAnalogOutputs(const InputState &inputs, OutputState &o
             }
         }
     }
+    // Dedicated shield-drop angle modifier
+    if (inputs.lf6 && directions.diagonal && directions.y == -1) {
+            outputs.leftStickX = 128 + (directions.x * 56);
+            outputs.leftStickY = 128 + (directions.y * 55);      
+    }
 
     // C-stick ASDI Slideoff angle overrides any other C-stick modifiers (such as
     // angled fsmash).
