@@ -24,15 +24,18 @@ void Melee20Button::UpdateDigitalOutputs(const InputState &inputs, OutputState &
     outputs.x = inputs.rf2;
     outputs.y = inputs.rf6;
     outputs.buttonR = inputs.rf3;
+
     if (inputs.nunchuk_connected) {
         outputs.triggerLDigital = inputs.nunchuk_z;
     } else {
         outputs.triggerLDigital = inputs.lf4;
     }
+
     outputs.triggerRDigital = inputs.rf5;
     outputs.start = inputs.mb1;
 
     // Hidden Buttons for remapp.ing options
+    // L3 / lf6 is repurposed as the dedicated shield-drop modifier.
     // outputs.leftStickClick = inputs.lf6;
     outputs.rightStickClick = inputs.lf7;
     outputs.capture = inputs.lf8;
@@ -70,36 +73,47 @@ void Melee20Button::UpdateAnalogOutputs(const InputState &inputs, OutputState &o
     );
 
     bool shield_button_pressed = inputs.lf4 || inputs.rf5 || inputs.rf7 || inputs.rf8;
+
+    // Normal digital diagonals.
+    //
+    // Lower diagonal:
+    // 67 / 43 = DBOOC-style geometry based on the keyboard-controller feel.
+    //
+    // Upper diagonal:
+    // Keep stock 56 / 56 behavior.
     if (directions.diagonal) {
-        // q1/2 = 7000 7000
-        outputs.leftStickX = 128 + (directions.x * 56);
-        outputs.leftStickY = 128 + (directions.y * 56);
-        // L, R, LS, and MS + q3/4 = 7000 6875 (For vanilla shield drop. Gives 44.5
-        // degree wavedash). Also used as default q3/4 diagonal if crouch walk option select is
-        // enabled.
-        if (directions.y == -1 && (shield_button_pressed || _options.crouch_walk_os)) {
+        if (directions.y == -1) {
+            outputs.leftStickX = 128 + (directions.x * 67);
+            outputs.leftStickY = 128 + (directions.y * 43);
+        } else {
             outputs.leftStickX = 128 + (directions.x * 56);
-            outputs.leftStickY = 128 + (directions.y * 55);
+            outputs.leftStickY = 128 + (directions.y * 56);
         }
     }
 
     /* Mod X */
     if (inputs.lt1) {
-        // MX + Horizontal (even if shield is held) = 6625 = 53
+        // MX + Horizontal = 6625 = 53
         if (directions.horizontal) {
             outputs.leftStickX = 128 + (directions.x * 53);
         }
-        // MX + Vertical (even if shield is held) = 5375 = 43
+
+        // MX + Vertical = 5375 = 43
         if (directions.vertical) {
             outputs.leftStickY = 128 + (directions.y * 43);
         }
+
         if (directions.diagonal && shield_button_pressed) {
             // Use custom airdodge angle if set, otherwise B0XX standard default.
+            // A later lower-diagonal override gives Mod X its dedicated max-WD
+            // coordinate.
             if (_options.has_custom_airdodge) {
-                outputs.leftStickX = 128 + (directions.x * _options.custom_airdodge.x);
-                outputs.leftStickY = 128 + (directions.y * _options.custom_airdodge.y);
+                outputs.leftStickX =
+                    128 + (directions.x * _options.custom_airdodge.x);
+                outputs.leftStickY =
+                    128 + (directions.y * _options.custom_airdodge.y);
             } else {
-                // MX + L, R, LS, and MS + q1/2/3/4 = 6375 3750 = 51 30
+                // MX + L, R, LS, and MS + diagonal = 6375 / 3750
                 outputs.leftStickX = 128 + (directions.x * 51);
                 outputs.leftStickY = 128 + (directions.y * 30);
             }
@@ -110,22 +124,26 @@ void Melee20Button::UpdateAnalogOutputs(const InputState &inputs, OutputState &o
             // 22.9638 - 7375 3125 = 59 25
             outputs.leftStickX = 128 + (directions.x * 59);
             outputs.leftStickY = 128 + (directions.y * 25);
-            // 27.37104 - 7000 3625 (27.38) = 56 29
+
+            // 27.37104 - 7000 3625 = 56 29
             if (inputs.rt2) {
                 outputs.leftStickX = 128 + (directions.x * 56);
                 outputs.leftStickY = 128 + (directions.y * 29);
             }
-            // 31.77828 - 7875 4875 (31.76) = 63 39
+
+            // 31.77828 - 7875 4875 = 63 39
             if (inputs.rt3) {
                 outputs.leftStickX = 128 + (directions.x * 63);
                 outputs.leftStickY = 128 + (directions.y * 39);
             }
-            // 36.18552 - 7000 5125 (36.21) = 56 41
+
+            // 36.18552 - 7000 5125 = 56 41
             if (inputs.rt4) {
                 outputs.leftStickX = 128 + (directions.x * 56);
                 outputs.leftStickY = 128 + (directions.y * 41);
             }
-            // 40.59276 - 6125 5250 (40.6) = 49 42
+
+            // 40.59276 - 6125 5250 = 49 42
             if (inputs.rt5) {
                 outputs.leftStickX = 128 + (directions.x * 49);
                 outputs.leftStickY = 128 + (directions.y * 42);
@@ -133,25 +151,29 @@ void Melee20Button::UpdateAnalogOutputs(const InputState &inputs, OutputState &o
 
             /* Extended Up B Angles */
             if (inputs.rf1) {
-                // 22.9638 - 9125 3875 (23.0) = 73 31
+                // 22.9638 - 9125 3875 = 73 31
                 outputs.leftStickX = 128 + (directions.x * 73);
                 outputs.leftStickY = 128 + (directions.y * 31);
-                // 27.37104 - 8750 4500 (27.2) = 70 36
+
+                // 27.37104 - 8750 4500 = 70 36
                 if (inputs.rt2) {
                     outputs.leftStickX = 128 + (directions.x * 70);
                     outputs.leftStickY = 128 + (directions.y * 36);
                 }
-                // 31.77828 - 8500 5250 (31.7) = 68 42
+
+                // 31.77828 - 8500 5250 = 68 42
                 if (inputs.rt3) {
                     outputs.leftStickX = 128 + (directions.x * 68);
                     outputs.leftStickY = 128 + (directions.y * 42);
                 }
-                // 36.18552 - 7375 5375 (36.1) = 59 43
+
+                // 36.18552 - 7375 5375 = 59 43
                 if (inputs.rt4) {
                     outputs.leftStickX = 128 + (directions.x * 59);
                     outputs.leftStickY = 128 + (directions.y * 43);
                 }
-                // 40.59276 - 6375 5375 (40.1) = 51 43
+
+                // 40.59276 - 6375 5375 = 51 43
                 if (inputs.rt5) {
                     outputs.leftStickX = 128 + (directions.x * 51);
                     outputs.leftStickY = 128 + (directions.y * 43);
@@ -167,109 +189,81 @@ void Melee20Button::UpdateAnalogOutputs(const InputState &inputs, OutputState &o
         }
     }
 
-    /* Mod Y */
+    /*
+     * Mod Y - Tilt + Shield Control
+     *
+     * Horizontal = 53
+     * Vertical   = 43
+     * Diagonal   = 51 / 30
+     *
+     * Same modifier can therefore be used for controlled tilts and
+     * deliberate shield movement.
+     */
     if (inputs.lt2) {
-        // MY + Horizontal (even if shield is held) = 3375 = 27
+        // Horizontal: f-tilt / horizontal shield movement
         if (directions.horizontal) {
-            outputs.leftStickX = 128 + (directions.x * 27);
+            outputs.leftStickX = 128 + (directions.x * 53);
         }
-        // MY + Vertical (even if shield is held) = 7375 = 59
+
+        // Vertical: up/down tilt / vertical shield movement
         if (directions.vertical) {
-            outputs.leftStickY = 128 + (directions.y * 59);
-        }
-        if (directions.diagonal && shield_button_pressed) {
-            // MY + L, R, LS, and MS + q1/2 = 4750 8750 = 38 70
-            outputs.leftStickX = 128 + (directions.x * 38);
-            outputs.leftStickY = 128 + (directions.y * 70);
-            // MY + L, R, LS, and MS + q3/4 = 5000 8500 = 40 68
-            if (directions.y == -1) {
-                outputs.leftStickX = 128 + (directions.x * 40);
-                outputs.leftStickY = 128 + (directions.y * 68);
-            }
+            outputs.leftStickY = 128 + (directions.y * 43);
         }
 
-        // Turnaround neutral B nerf
-        if (inputs.rf1) {
-            outputs.leftStickX = 128 + (directions.x * 80);
-        }
-
-        /* Up B angles */
-        if (directions.diagonal && !shield_button_pressed) {
-            // 67.0362 - 3125 7375 = 25 59
-            outputs.leftStickX = 128 + (directions.x * 25);
-            outputs.leftStickY = 128 + (directions.y * 59);
-            // 62.62896 - 3625 7000 (62.62) = 29 56
-            if (inputs.rt2) {
-                outputs.leftStickX = 128 + (directions.x * 29);
-                outputs.leftStickY = 128 + (directions.y * 56);
-            }
-            // 58.22172 - 4875 7875 (58.24) = 39 63
-            if (inputs.rt3) {
-                outputs.leftStickX = 128 + (directions.x * 39);
-                outputs.leftStickY = 128 + (directions.y * 63);
-            }
-            // 53.81448 - 5125 7000 (53.79) = 41 56
-            if (inputs.rt4) {
-                outputs.leftStickX = 128 + (directions.x * 41);
-                outputs.leftStickY = 128 + (directions.y * 56);
-            }
-            // 49.40724 - 6375 7625 (50.10) = 51 61
-            if (inputs.rt5) {
-                outputs.leftStickX = 128 + (directions.x * 51);
-                outputs.leftStickY = 128 + (directions.y * 61);
-            }
-
-            /* Extended Up B Angles */
-            if (inputs.rf1) {
-                // 67.0362 - 3875 9125 = 31 73
-                outputs.leftStickX = 128 + (directions.x * 31);
-                outputs.leftStickY = 128 + (directions.y * 73);
-                // 62.62896 - 4500 8750 (62.8) = 36 70
-                if (inputs.rt2) {
-                    outputs.leftStickX = 128 + (directions.x * 36);
-                    outputs.leftStickY = 128 + (directions.y * 70);
-                }
-                // 58.22172 - 5250 8500 (58.3) = 42 68
-                if (inputs.rt3) {
-                    outputs.leftStickX = 128 + (directions.x * 42);
-                    outputs.leftStickY = 128 + (directions.y * 68);
-                }
-                // 53.81448 - 5875 8000 (53.7) = 47 64
-                if (inputs.rt4) {
-                    outputs.leftStickX = 128 + (directions.x * 47);
-                    outputs.leftStickY = 128 + (directions.y * 64);
-                }
-                // 49.40724 - 5875 7125 (50.49) = 47 57
-                if (inputs.rt5) {
-                    outputs.leftStickX = 128 + (directions.x * 47);
-                    outputs.leftStickY = 128 + (directions.y * 57);
-                }
-            }
+        // Diagonal: angled tilt / diagonal shield movement
+        if (directions.diagonal) {
+            outputs.leftStickX = 128 + (directions.x * 51);
+            outputs.leftStickY = 128 + (directions.y * 30);
         }
     }
-    // Dedicated shield-drop modifier
+
+    /*
+     * Mod X - dedicated maximum-wavedash lower diagonal.
+     *
+     * 75 / 26 is approximately 70.9 degrees measured from straight Down,
+     * matching the ~70-72 degree convention we're using.
+     *
+     * This is deliberately placed AFTER the normal Mod X processing so it
+     * gets final say whenever Mod X + a lower diagonal is held.
+     */
+    if (inputs.lt1 && directions.diagonal && directions.y == -1) {
+        outputs.leftStickX = 128 + (directions.x * 75);
+        outputs.leftStickY = 128 + (directions.y * 26);
+    }
+
+    /*
+     * Dedicated shield-drop modifier.
+     *
+     * L3 / lf6 does nothing special by itself.
+     * Shield + Down + L3 outputs the dedicated straight-down shield-drop
+     * coordinate.
+     */
     if (inputs.lf6 && shield_button_pressed &&
         directions.vertical && directions.y == -1) {
         outputs.leftStickX = 128;
         outputs.leftStickY = 73;
     }
-    // C-stick ASDI Slideoff angle overrides any other C-stick modifiers (such as
-    // angled fsmash).
+
+    // C-stick ASDI Slideoff angle overrides any other C-stick modifiers
+    // (such as angled fsmash).
     if (directions.cx != 0 && directions.cy != 0) {
         // 5250 8500 = 42 68
         outputs.rightStickX = 128 + (directions.cx * 42);
         outputs.rightStickY = 128 + (directions.cy * 68);
     }
 
-    // Horizontal SOCD overrides X-axis modifiers (for ledgedash maximum jump
-    // trajectory).
-    if (!_options.disable_ledgedash_socd_override && _horizontal_socd && !directions.vertical) {
+    // Horizontal SOCD overrides X-axis modifiers
+    // (for ledgedash maximum jump trajectory).
+    if (!_options.disable_ledgedash_socd_override &&
+        _horizontal_socd &&
+        !directions.vertical) {
         outputs.leftStickX = 128 + (directions.x * 80);
     }
 
     if (inputs.rf7) {
         outputs.triggerRAnalog = 49;
     }
+
     if (inputs.rf8) {
         outputs.triggerRAnalog = 94;
     }
@@ -277,6 +271,7 @@ void Melee20Button::UpdateAnalogOutputs(const InputState &inputs, OutputState &o
     if (outputs.triggerLDigital) {
         outputs.triggerLAnalog = 140;
     }
+
     if (outputs.triggerRDigital) {
         outputs.triggerRAnalog = 140;
     }
