@@ -36,16 +36,16 @@ GpioButtonMapping button_mappings[] = {
     { BTN_RT5, 15 }, // C-Right
 
     // Right top row, index to pinky
-    { BTN_RF2, 26 },  // X (stock R)
-    { BTN_LF14, 22 }, // L, combined into lf4 in loop1() (stock Y)
-    { BTN_RF8, 21 },  // Medium Shield (stock Light Shield)
-    { BTN_LF6, 20 },  // Shield Drop (stock Medium Shield)
+    { BTN_RF5, 26 }, // R (stock R)
+    { BTN_RF3, 22 }, // Z (stock Y)
+    { BTN_RF8, 21 }, // Medium Shield (stock Light Shield)
+    { BTN_LF6, 20 }, // Shield Drop (stock Medium Shield)
 
     // Right bottom row, index to pinky
-    { BTN_RF5, 19 }, // R (stock B)
-    { BTN_RF3, 18 }, // Z (stock X)
-    { BTN_RF1, 17 }, // B (stock Z)
-    { BTN_RF4, 16 }, // Up (stock Up)
+    { BTN_RF2, 19 },  // X (stock B)
+    { BTN_LF14, 18 }, // L, combined into lf4 in loop1() (stock X)
+    { BTN_RF1, 17 },  // B (stock Z)
+    { BTN_RF4, 16 },  // Up (stock Up)
 };
 const size_t button_count = sizeof(button_mappings) / sizeof(GpioButtonMapping);
 
